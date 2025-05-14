@@ -1,0 +1,8 @@
+Atividade envolvendo coleta de dados de uma API externa junto com manipulação do DOM.
+
+- Realizar uma requisição com método GET para o endpoint: https://jsonplaceholder.typicode.com/posts
+    - Exibir os resultados na tela (browser).
+    - Permitir, via JavaScript local, que o usuário:
+    - Adicione novos itens à lista.
+    - Remova qualquer item.
+    - Edite os itens localmente.

@@ -9,26 +9,48 @@ async function getPosts() {
     console.log(posts);
 }
 
-async function createNewPost(title, content) {
-    const newPost = {
-        userID: 15,
-        id: posts.length + 1,
-        title: title,
-        body: content
-    };
-    console.log("criou");
-    posts.push(newPost);    
+let editingPostId = null;
+
+async function createOrUpdatePost(e) {
+    e.preventDefault();
+    const title = document.getElementById('title').value.trim();
+    const content = document.getElementById('content').value.trim();
+    const form = document.getElementById('new-post');
+    const button = document.getElementById('button');
+    const buttonHide = document.querySelector('.hide-new-post');
+
+    if (!title || !content) return;
+
+    if (editingPostId === null) {
+        const newPost = {
+            userId: 15,
+            id: posts.length + 1,
+            title: title,
+            body: content
+        };
+        posts.push(newPost);
+        console.log("criado:", newPost);
+    } else {
+        const post = posts.find(p => p.id === editingPostId);
+        if (post) {
+            post.title = title;
+            post.body = content;
+            console.log("editando:", post);
+        }
+        editingPostId = null;
+        button.textContent = 'Postar';
+    }
+
+    renderPosts();
+    form.reset();
+    form.style.display = 'none';  
+    buttonHide.style.bottom = '1rem';
+    buttonHide.style.bottom = '1rem';  
+    buttonHide.style.left = '1rem';
+    buttonHide.textContent = '+'
+    document.querySelector('.hide-new-post span').textContent = '+';
 }
 
-document.getElementById('new-post').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = document.getElementById('title').value;
-    const content = document.getElementById('content').value;
-    console.log(title, content);
-    await createNewPost(title, content);
-    renderPosts();
-    e.target.reset();
-});
 
 async function deletePost(id) {
     const postIndex = posts.findIndex(post => post.id === id);
@@ -38,37 +60,30 @@ async function deletePost(id) {
     }
 }
 
-async function editPost(id) {
-    // console.log(id);
+function editPost(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
     const form = document.getElementById('new-post');
-    form.reset()
-    const post = posts.find(post => post.id === id);
-    if (post) {
-        const titleInput = document.getElementById('title');
-        const contentInput = document.getElementById('content');
-        const button = document.getElementById('button');
+    const titleInput = document.getElementById('title');
+    const contentInput = document.getElementById('content');
+    const button = document.getElementById('button');
+    const buttonHide = document.querySelector('.hide-new-post');
 
-        titleInput.value = post.title;
-        contentInput.value = post.body;
+    editingPostId = id;
 
-        form.style.display = 'flex';
-        button.textContent = 'Salvar';
-        document.querySelector('.hide-new-post span').textContent = 'X';
+    titleInput.value = post.title;
+    contentInput.value = post.body;
+    buttonHide.style.bottom = '19rem';
+    buttonHide.style.left = '19rem';
+    buttonHide.textContent = '+';
 
-        button.onclick = async (e) => {
-            e.preventDefault();
-            post.title = titleInput.value;
-            post.body = contentInput.value;
-
-            button.textContent = 'Postar';
-            button.onclick = null; 
-            form.style.display = 'none';
-            document.querySelector('.hide-new-post span').textContent = '+';
-
-            renderPosts();
-        };
-    }
+    form.style.display = 'flex';
+    button.textContent = 'Salvar';
+    document.querySelector('.hide-new-post span').textContent = 'X';
+    renderPosts();
 }
+
 
 async function renderPosts() {
     const postsContainer = document.querySelector('.posts');
@@ -134,3 +149,5 @@ async function showForm() {
         buttonHide.textContent = '+'
     }
 }
+
+document.getElementById('new-post').addEventListener('submit', createOrUpdatePost);
